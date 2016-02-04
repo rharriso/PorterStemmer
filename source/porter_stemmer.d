@@ -7,17 +7,25 @@ import std.stdio;
 
 string stem(T)(in T inS){
     string s = inS.toLower();
+    auto mc = mCount(inS);
 
     //step 1a
-    if(s[$-4..$] == "sses"){
+    if( s.length > 4 && s[$-4..$] == "sses"){
         s.length -= 2;
         replaceInPlace(s, s.length-2, s.length, "ss");
-    } else if(s[$-3..$] == "ies"){
+    } else if( s.length > 3 && s[$-3..$] == "ies"){
         s.length -= 2;
         replaceInPlace(s, s.length-1, s.length, "i");
-    } else if(s[$-2..$] == "ss"){
-    } else if(s[$-1..$] == "s"){
+    } else if(s.length > 2 && s[$-2..$] == "ss"){
+    } else if(s.length > 1 && s[$-1..$] == "s"){
         s.length --;
+    }
+
+
+    //step 1b
+    if(mc > 0 && s.length > 3 && s[$-3..$] == "eed"){
+      s.length--;
+      replaceInPlace(s, s.length-2, s.length, "ee");
     }
 
     return s;
@@ -28,18 +36,20 @@ string stem(T)(in T inS){
 */
 int mCount(T)(in T word){
   int m = 0;
-  auto isV = false;
+  auto isV = isVowel(word, 0);
 
-  for(int i; i < word.length; i++){
+  for(int i = 1; i < word.length; i++){
+    auto newV = isVowel(word, i);
+    
     // count up the number of vowel sets found
-    if(isV != isVowel(word, i)){
-      isV = !isV;
-      if(isV)
-        m++;
+    if(newV && !isV){
+      m++;
     }
+
+    isV = newV;
   }
 
-  // if the last set is a vowel subtract 1
+  // subtract 1 for trailing vowel
   if(isV){
     m--;
   }
@@ -78,15 +88,18 @@ unittest {
     // cases are just pairs onf expected outputs
     auto cases = [
         // 1a
-        tuple("caresses", "caress"),
+        /*tuple("caresses", "caress"),
         tuple("ties", "ti"),
         tuple("cats", "cat"),
-        tuple("ponies", "poni"),
+        tuple("ponies", "poni"),*/
+        //1b
+        tuple("feed", "feed"),
+        tuple("agreed", "agree"),
     ];
 
     foreach(c; cases){
         assert(stem(c[0]) == c[1],
-            "Expected '"~c[0]~"'to stem to '"~c[1]~"'");
+            "Expected '"~c[0]~"' to stem to '"~c[1]~"' got '"~stem(c[0])~"'");
     }
 }
 
@@ -96,6 +109,7 @@ unittest {
     auto cases = [
       tuple("tr", 0),
       tuple("ee", 0),
+      tuple("feed", 0),
       tuple("tree", 0),
       tuple("y", 0),
       tuple("by", 0),
@@ -111,7 +125,7 @@ unittest {
 
     foreach(c; cases){
       assert(mCount(c[0]) == c[1], 
-          "Expected '"~c[0]~"' to have an mcount '"~to!(string)(c[1])~"'");
+          "Expected '"~c[0]~"' to have an mcount '"~to!(string)(c[1])~"' got '"~to!(string)(mCount(c[0]))~"'");
 
     }
 }
