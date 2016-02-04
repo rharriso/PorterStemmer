@@ -23,6 +23,29 @@ string stem(T)(in T inS){
     return s;
 }
 
+/*
+  returns the mcount for the given word
+*/
+int mCount(T)(in T word){
+  int m = 0;
+  auto isV = false;
+
+  for(int i; i < word.length; i++){
+    // count up the number of vowel sets found
+    if(isV != isVowel(word, i)){
+      isV = !isV;
+      if(isV)
+        m++;
+    }
+  }
+
+  // if the last set is a vowel subtract 1
+  if(isV){
+    m--;
+  }
+
+  return m;
+}
 
 /*
   Returns true if the letter at
@@ -64,6 +87,32 @@ unittest {
     foreach(c; cases){
         assert(stem(c[0]) == c[1],
             "Expected '"~c[0]~"'to stem to '"~c[1]~"'");
+    }
+}
+
+unittest {
+    import std.conv;
+
+    auto cases = [
+      tuple("tr", 0),
+      tuple("ee", 0),
+      tuple("tree", 0),
+      tuple("y", 0),
+      tuple("by", 0),
+      tuple("trouble", 1),
+      tuple("oats", 1),
+      tuple("trees", 1),
+      tuple("ivy", 1),
+      tuple("troubles", 2),
+      tuple("private", 2),
+      tuple("oaten", 2),
+      tuple("orrery", 2),
+    ];
+
+    foreach(c; cases){
+      assert(mCount(c[0]) == c[1], 
+          "Expected '"~c[0]~"' to have an mcount '"~to!(string)(c[1])~"'");
+
     }
 }
 
