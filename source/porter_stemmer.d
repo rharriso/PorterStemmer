@@ -7,7 +7,7 @@ import std.stdio;
 
 string stem(T)(in T inS){
     string s = inS.toLower();
-    auto mc = mCount(inS);
+    auto mc = measure(inS);
 
     //step 1a
     if( s.length > 4 && s[$-4..$] == "sses"){
@@ -19,42 +19,60 @@ string stem(T)(in T inS){
     } else if(s.length > 2 && s[$-2..$] == "ss"){
     } else if(s.length > 1 && s[$-1..$] == "s"){
         s.length --;
-    }
-
+    } 
 
     //step 1b
-    if(mc > 0 && s.length > 3 && s[$-3..$] == "eed"){
-      s.length--;
-      replaceInPlace(s, s.length-2, s.length, "ee");
+    if(s.length > 3 &&  s[$-3..$] == "eed")
+    {
+      if(measure(s, 4) > 0){
+        s.length--;
+      }
     }
 
+    else if(s.length > 2 && s[$-2..$] == "ed"
+        && containsVowel(s[0..$-2])){
+
+      s.length -= 2;
+    }
+    else if(s.length > 3 && s[$-3..$] == "ing"
+        && containsVowel(s[0..$-3])){
+      s.length -= 3;
+    }
     return s;
 }
 
 /*
   returns the mcount for the given word
 */
-int mCount(T)(in T word){
+int measure(T)(in T word, int offset=0){
   int m = 0;
   auto isV = isVowel(word, 0);
+  auto len = long(word.length) - offset;
 
-  for(int i = 1; i < word.length; i++){
+  for(int i = 1; i < len; i++){
     auto newV = isVowel(word, i);
     
     // count up the number of vowel sets found
-    if(newV && !isV){
+    if(!newV && isV){
       m++;
     }
 
     isV = newV;
   }
 
-  // subtract 1 for trailing vowel
-  if(isV){
-    m--;
-  }
-
   return m;
+}
+
+/*
+  returns true if the passes string contains a vowel
+*/
+bool  containsVowel(T)(in T word){
+  for(auto i = 0; i < word.length; i++){
+    if(isVowel(word, i)){
+      return true;
+    }
+  }
+  return false;
 }
 
 /*
@@ -83,18 +101,28 @@ bool isVowel(T)(in T word, int index){
   } 
 }
 
+/*
+  returns true if the word ends with 
+ */
 
+
+/*
+   stemStes
+ */
 unittest {
     // cases are just pairs onf expected outputs
     auto cases = [
-        // 1a
-        /*tuple("caresses", "caress"),
+        tuple("caresses", "caress"),
         tuple("ties", "ti"),
         tuple("cats", "cat"),
-        tuple("ponies", "poni"),*/
+        tuple("ponies", "poni"),
         //1b
         tuple("feed", "feed"),
         tuple("agreed", "agree"),
+        tuple("plastered", "plaster"),
+        tuple("bled", "bled"),
+        tuple("motoring", "motor"),
+        tuple("sing", "sing"),
     ];
 
     foreach(c; cases){
@@ -103,13 +131,16 @@ unittest {
     }
 }
 
+/*
+  measure tests
+ */
 unittest {
     import std.conv;
 
     auto cases = [
       tuple("tr", 0),
       tuple("ee", 0),
-      tuple("feed", 0),
+      tuple("feed", 1),
       tuple("tree", 0),
       tuple("y", 0),
       tuple("by", 0),
@@ -124,12 +155,36 @@ unittest {
     ];
 
     foreach(c; cases){
-      assert(mCount(c[0]) == c[1], 
-          "Expected '"~c[0]~"' to have an mcount '"~to!(string)(c[1])~"' got '"~to!(string)(mCount(c[0]))~"'");
+      assert(measure(c[0]) == c[1], 
+          "Expected '"~c[0]~"' to have an mcount '"~to!(string)(c[1])~"' got '"~to!(string)(measure(c[0]))~"'");
 
     }
 }
 
+/*
+  containsVowelTests
+ */
+unittest{
+  auto cases = [
+    tuple("aa", true),
+    tuple("ba", true),
+    tuple("bb", false),
+    tuple("by", true),
+    tuple("yy", true),
+    tuple("happy", true),
+    tuple("cpp", false)
+  ];
+
+  foreach(c; cases){
+    auto phrase = c[1] ? "to contain a vowel" :
+      "not to contain a vowel";
+    assert(containsVowel(c[0]) == c[1], "Expected '"~c[0]~"' "~phrase);
+  }
+}
+
+/*
+  isVowelTests
+ */
 unittest {
     auto cases = [
       tuple("caresses", 0, false),
