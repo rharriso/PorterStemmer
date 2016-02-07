@@ -10,15 +10,15 @@ string stem(T)(in T inS)
   string s = inS.toLower();
   auto mc = measure(inS);
 
-  step1ab(s);
+  step1(s);
 
   return s;
 }
 
 /*
-   Apply step 1 and b to passed string
+   Apply step 1 a, b and c to passed string
  */
-void step1ab(T)(ref T s){
+void step1(T)(ref T s){
   //step 1a
   if (s.length > 4 && s[$ - 4 .. $] == "sses")
   {
