@@ -51,26 +51,31 @@ void step1ab(T)(ref T s){
   {
 
     s.length -= 2;
-    step1c(s);
+    step1b2(s);
   }
   else if (s.length > 3 && s[$ - 3 .. $] == "ing" && containsVowel(s[0 .. $ - 3]))
   {
     s.length -= 3;
-    step1c(s);
+    step1b2(s);
   }
 }
 
 /*
-   apply step1c to string
+   apply second half of step b to string
  */
-void step1c(T)(ref T s){
+void step1b2(T)(ref T s){
   auto tail =  s[$ - 2 .. $];
+  
   if(s.length > 2 &&
       tail == "at" ||
       tail == "iz" ||
       tail == "bl"){
 
     s ~= "e";
+  } else if(!isVowel(tail, 0) && !isVowel(tail, 1) && 
+      !(tail[1] == 'l' || tail[1] == 's' || tail[1] == 'z'))
+  {
+    s.length --;
   }
 }
 
@@ -164,10 +169,17 @@ unittest
     tuple("bled", "bled"),
     tuple("motoring", "motor"),
     tuple("sing", "sing"),
-    //1c
+    //1b2
     tuple("conflated", "conflate"),
     tuple("troubled", "trouble"),
     tuple("sized", "size"),
+    tuple("hopping", "hop"),
+    tuple("tanned", "tan"),
+    tuple("falling", "fall"),
+    tuple("hissing", "hiss"),
+    tuple("fizzed", "fizz"),
+    tuple("failing", "fail"),
+    tuple("filing", "file"),
   ];
 
   foreach (c; cases)
