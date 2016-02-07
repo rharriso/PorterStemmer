@@ -58,6 +58,12 @@ void step1ab(T)(ref T s){
     s.length -= 3;
     step1b2(s);
   }
+
+  //step1c
+  if (s[$-1] == 'y' && containsVowel(s[0 .. $ - 1]))
+  {
+    replaceInPlace(s, s.length - 1, s.length, "i");
+  }
 }
 
 /*
@@ -146,7 +152,6 @@ bool isVowel(T)(in T word, ulong index)
       return index > 0 && !isVowel(word, index - 1);
     default:
       return false;
-
   }
 }
 
@@ -183,6 +188,9 @@ unittest
     tuple("fizzed", "fizz"),
     tuple("failing", "fail"),
     tuple("filing", "file"),
+    //1c
+    tuple("happy", "happi"),
+    tuple("sky", "sky"),
   ];
 
   foreach (c; cases)
