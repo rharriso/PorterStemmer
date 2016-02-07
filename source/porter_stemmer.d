@@ -72,17 +72,26 @@ void step1b2(T)(ref T s){
       tail == "bl"){
 
     s ~= "e";
-  } else if(!isVowel(tail, 0) && !isVowel(tail, 1) && 
-      !(tail[1] == 'l' || tail[1] == 's' || tail[1] == 'z'))
+  }
+
+  else if(!isVowel(tail, 0) && !isVowel(tail, 1) && 
+    !(tail[1] == 'l' || tail[1] == 's' || tail[1] == 'z'))
   {
     s.length --;
+  } 
+
+  else if(measure(s) == 1 &&
+      !isVowel(s, s.length - 3) && 
+      isVowel(s, s.length - 2) && 
+      !isVowel(s, s.length - 1)){
+    s ~= "e";
   }
 }
 
 /*
    returns the mcount for the given word
  */
-int measure(T)(in T word, int offset = 0)
+int measure(T)(in T word, ulong offset = 0)
 {
   int m = 0;
   auto isV = isVowel(word, 0);
@@ -123,8 +132,12 @@ bool containsVowel(T)(in T word)
    Returns true if the letter at
    the passed index is a vowel
  */
-bool isVowel(T)(in T word, int index)
+bool isVowel(T)(in T word, ulong index)
 {
+  if(index >= word.length){
+    return false;
+  }
+
   switch (word[index])
   {
     case 'a':
