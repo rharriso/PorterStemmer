@@ -9,6 +9,12 @@ string stem(T)(in T inS){
     string s = inS.toLower();
     auto mc = measure(inS);
 
+    step1ab(s);
+
+    return s;
+}
+
+void step1ab(T)(ref T s){
     //step 1a
     if( s.length > 4 && s[$-4..$] == "sses"){
         s.length -= 2;
@@ -38,7 +44,7 @@ string stem(T)(in T inS){
         && containsVowel(s[0..$-3])){
       s.length -= 3;
     }
-    return s;
+
 }
 
 /*
