@@ -64,6 +64,14 @@ void step1ab(T)(ref T s){
    apply step1c to string
  */
 void step1c(T)(ref T s){
+  auto tail =  s[$ - 2 .. $];
+  if(s.length > 2 &&
+      tail == "at" ||
+      tail == "iz" ||
+      tail == "bl"){
+
+    s ~= "e";
+  }
 }
 
 /*
@@ -156,6 +164,10 @@ unittest
     tuple("bled", "bled"),
     tuple("motoring", "motor"),
     tuple("sing", "sing"),
+    //1c
+    tuple("conflated", "conflate"),
+    tuple("troubled", "trouble"),
+    tuple("sized", "size"),
   ];
 
   foreach (c; cases)
