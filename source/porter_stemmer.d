@@ -140,19 +140,9 @@ bool isVowel(T)(in T word, ulong index)
 
   switch (word[index])
   {
-    case 'a':
-    case 'A':
-    case 'e':
-    case 'E':
-    case 'i':
-    case 'I':
-    case 'o':
-    case 'O':
-    case 'u':
-    case 'U':
+    case 'a', 'e', 'i', 'o', 'u':
       return true;
     case 'y':
-    case 'Y':
       return index > 0 && !isVowel(word, index - 1);
     default:
       return false;
