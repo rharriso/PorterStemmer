@@ -4,10 +4,10 @@ Porter Stemmer for Dlang
 # Steps (each with test cases)
 
 * [x] step1a
-* [] step1b
-* [] step1c
-* [] step2
-* [] step3
+* [x] step1b
+* [x] step1c
+* [x] step2
+* [x] step3
 * [] step4
 * [] step5a
 * [] step5b
