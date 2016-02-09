@@ -12,6 +12,7 @@ string stem(T)(in T inS)
 
   step1(s);
   step2(s);
+  step3(s);
 
   return s;
 }
@@ -100,18 +101,57 @@ void step1b2(T)(ref T s)
 void step2(T)(ref T s)
 {
   auto mappings = [
-    tuple("ational", "ate"), tuple("tional", "tion"), tuple("enci", "ence"),
-    tuple("anci", "ance"), tuple("izer", "ize"), tuple("abli", "able"),
-    tuple("alli", "al"), tuple("entli", "ent"), tuple("eli", "e"),
-    tuple("ousli", "ous"), tuple("ization", "ize"), tuple("ation", "ate"),
-    tuple("ator", "ate"), tuple("alism", "al"), tuple("iveness", "ive"),
-    tuple("fulness", "ful"), tuple("ousness", "ous"), tuple("aliti", "al"),
-    tuple("iviti", "ive"), tuple("biliti", "ble"),
+    tuple("ational", "ate"),
+    tuple("tional", "tion"),
+    tuple("enci", "ence"),
+    tuple("anci", "ance"),
+    tuple("izer", "ize"),
+    tuple("abli", "able"),
+    tuple("alli", "al"),
+    tuple("entli", "ent"),
+    tuple("eli", "e"),
+    tuple("ousli", "ous"),
+    tuple("ization", "ize"),
+    tuple("ation", "ate"),
+    tuple("ator", "ate"),
+    tuple("alism", "al"),
+    tuple("iveness", "ive"),
+    tuple("fulness", "ful"),
+    tuple("ousness", "ous"),
+    tuple("aliti", "al"),
+    tuple("iviti", "ive"),
+    tuple("biliti", "ble"),
   ];
 
+  applyMapping(s, mappings);
+}
+
+/*
+   apply step
+ */
+void step3(T)(ref T s){
+  auto mappings = [
+    tuple("icate", "ic"),
+    tuple("ative", ""),
+    tuple("alize", "al"),
+    tuple("iciti", "ic"),
+    tuple("ical", "ic"),
+    tuple("ful", ""),
+    tuple("ness", ""),
+   ];
+
+  applyMapping(s, mappings);
+}
+
+/*
+ applyMappings applies the appropriate map to the passed string,
+ and checks a minumum measure
+ */
+void applyMapping(T)(ref T s, Tuple!(string, string)[] mappings, ulong minMeasure=1)
+{
   foreach (m; mappings)
   {
-    if (s.length <= m[0].length || measure(s, m[0].length) == 0)
+    if (s.length <= m[0].length || measure(s, m[0].length) < minMeasure)
       continue;
 
     if (s[$ - m[0].length .. $] == m[0])
@@ -121,14 +161,15 @@ void step2(T)(ref T s)
       return;
     }
   }
+
 }
 
 /*
    returns the mcount for the given word
  */
-int measure(T)(in T word, ulong offset = 0)
+ulong measure(T)(in T word, ulong offset = 0)
 {
-  int m = 0;
+  ulong m = 0;
   auto isV = isVowel(word, 0);
   auto len = long(word.length) - offset;
 
@@ -196,28 +237,61 @@ unittest
 {
   // cases are just pairs onf expected outputs
   auto cases = [
-    tuple("caresses", "caress"), tuple("ties", "ti"), tuple("cats", "cat"),
-    tuple("ponies", "poni"), //1b
-    tuple("feed", "feed"), tuple("agreed", "agree"),
-    tuple("plastered", "plaster"), tuple("bled", "bled"), tuple("motoring",
-    "motor"), tuple("sing", "sing"), //1b2
+    tuple("caresses", "caress"),
+    tuple("ties", "ti"),
+    tuple("cats", "cat"),
+    tuple("ponies", "poni"),
+    //1b
+    tuple("feed", "feed"),
+    tuple("agreed", "agree"),
+    tuple("plastered", "plaster"),
+    tuple("bled", "bled"),
+    tuple("motoring", "motor"),
+    tuple("sing", "sing"),
+    //1b2
     tuple("conflated", "conflate"),
-    tuple("troubled", "trouble"), tuple("sized", "size"), tuple("hopping",
-    "hop"), tuple("tanned", "tan"), tuple("falling", "fall"), tuple("hissing",
-    "hiss"), tuple("fizzed", "fizz"), tuple("failing", "fail"), tuple("filing",
-    "file"), //1c
-    tuple("happy", "happi"), tuple("sky", "sky"), // 2
-    tuple("relational",
-    "relate"), tuple("conditional", "condition"), tuple("rational",
-    "rational"), tuple("valenci", "valence"), tuple("hesitanci", "hesitance"),
-    tuple("digitizer", "digitize"), tuple("conformabli", "conformable"),
-    tuple("radicalli", "radical"), tuple("differentli", "different"),
-    tuple("vileli", "vile"), tuple("analogousli", "analogous"),
-    tuple("vietnamization", "vietnamize"), tuple("predication", "predicate"),
-    tuple("operator", "operate"), tuple("feudalism", "feudal"),
-    tuple("decisiveness", "decisive"), tuple("hopefulness", "hopeful"),
-    tuple("callousness", "callous"), tuple("formaliti", "formal"),
-    tuple("sensitiviti", "sensitive"), tuple("sensibiliti", "sensible"),
+    tuple("troubled", "trouble"),
+    tuple("sized", "size"),
+    tuple("hopping", "hop"),
+    tuple("tanned", "tan"),
+    tuple("falling", "fall"),
+    tuple("hissing", "hiss"),
+    tuple("fizzed", "fizz"),
+    tuple("failing", "fail"),
+    tuple("filing", "file"),
+    //1c
+    tuple("happy", "happi"),
+    tuple("sky", "sky"),
+    // 2
+    tuple("relational", "relate"),
+    tuple("conditional", "condition"),
+    tuple("rational", "rational"),
+    tuple("valenci", "valence"),
+    tuple("hesitanci", "hesitance"),
+    tuple("digitizer", "digitize"),
+    tuple("conformabli", "conformable"),
+    tuple("radicalli", "radic"),
+    tuple("differentli", "different"),
+    tuple("vileli", "vile"),
+    tuple("analogousli", "analogous"),
+    tuple("vietnamization", "vietnamize"),
+    tuple("predication", "predic"),
+    tuple("operator", "operate"),
+    tuple("feudalism", "feudal"),
+    tuple("decisiveness", "decisive"),
+    tuple("hopefulness", "hope"),
+    tuple("callousness", "callous"),
+    tuple("formaliti", "formal"),
+    tuple("sensitiviti", "sensitive"),
+    tuple("sensibiliti", "sensible"),
+    // 3
+    tuple("triplicate", "triplic"),
+    tuple("formative", "form"),
+    tuple("formalize", "formal"),
+    tuple("electriciti", "electric"),
+    tuple("electrical", "electric"),
+    tuple("hopeful", "hope"),
+    tuple("goodness", "good"),
   ];
 
   foreach (c; cases)
@@ -234,10 +308,22 @@ unittest
 {
   import std.conv;
 
-  auto cases = [tuple("tr", 0), tuple("ee", 0), tuple("feed", 1), tuple("tree",
-    0), tuple("y", 0), tuple("by", 0), tuple("trouble", 1), tuple("oats", 1),
-    tuple("trees", 1), tuple("ivy", 1), tuple("troubles", 2), tuple("private",
-    2), tuple("oaten", 2), tuple("orrery", 2)];
+  auto cases = [
+    tuple("tr", 0),
+    tuple("ee", 0),
+    tuple("feed", 1),
+    tuple("tree", 0),
+    tuple("y", 0),
+    tuple("by", 0),
+    tuple("trouble", 1),
+    tuple("oats", 1),
+    tuple("trees", 1),
+    tuple("ivy", 1),
+    tuple("troubles", 2),
+    tuple("private", 2),
+    tuple("oaten", 2),
+    tuple("orrery", 2)
+  ];
 
   foreach (c; cases)
   {
@@ -254,8 +340,13 @@ unittest
 unittest
 {
   auto cases = [
-    tuple("aa", true), tuple("ba", true), tuple("bb", false), tuple("by",
-    true), tuple("yy", true), tuple("happy", true), tuple("cpp", false)
+    tuple("aa", true),
+    tuple("ba", true),
+    tuple("bb", false),
+    tuple("by", true),
+    tuple("yy", true),
+    tuple("happy", true),
+    tuple("cpp", false)
   ];
 
   foreach (c; cases)
@@ -271,9 +362,14 @@ unittest
 unittest
 {
   auto cases = [
-    tuple("caresses", 0, false), tuple("caresses", 1, true), tuple("caresses",
-    3, true), tuple("caresses", 4, false), tuple("caresses", 6, true),
-    tuple("cray", 3, false), tuple("try", 2, true), tuple("yak", 0, false)
+    tuple("caresses", 0, false),
+    tuple("caresses", 1, true),
+    tuple("caresses", 3, true),
+    tuple("caresses", 4, false),
+    tuple("caresses", 6, true),
+    tuple("cray", 3, false),
+    tuple("try", 2, true),
+    tuple("yak", 0, false)
   ];
 
   foreach (c; cases)
