@@ -8,7 +8,7 @@ Porter Stemmer for Dlang
 * [x] step1c
 * [x] step2
 * [x] step3
-* [] step4
+* [x] step4
 * [] step5a
 * [] step5b
 * [] benchmarks

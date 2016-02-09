@@ -13,6 +13,7 @@ string stem(T)(in T inS)
   step1(s);
   step2(s);
   step3(s);
+  step4(s);
 
   return s;
 }
@@ -144,6 +145,37 @@ void step3(T)(ref T s){
 }
 
 /*
+   apply step4
+ */
+void step4(T)(ref T s)
+{
+  auto mappings = [
+    tuple("al", ""),
+    tuple("ance", ""),
+    tuple("ence", ""),
+    tuple("er", ""),
+    tuple("ic", ""),
+    tuple("able", ""),
+    tuple("ible", ""),
+    tuple("ant", ""),
+    tuple("ement", ""),
+    tuple("ment", ""),
+    tuple("ent", ""),
+    tuple("tion", ""),
+    tuple("sion", ""),
+    tuple("ou", ""),
+    tuple("ism", ""),
+    tuple("ate", ""),
+    tuple("iti", ""),
+    tuple("ous", ""),
+    tuple("ive", ""),
+    tuple("ize", ""),
+  ];
+
+  applyMapping(s, mappings, 2);
+}
+
+/*
  applyMappings applies the appropriate map to the passed string,
  and checks a minumum measure
  */
@@ -265,33 +297,53 @@ unittest
     // 2
     tuple("relational", "relate"),
     tuple("conditional", "condition"),
-    tuple("rational", "rational"),
+    tuple("rational", "ration"),
     tuple("valenci", "valence"),
-    tuple("hesitanci", "hesitance"),
-    tuple("digitizer", "digitize"),
-    tuple("conformabli", "conformable"),
+    tuple("hesitanci", "hesit"),
+    tuple("digitizer", "digit"),
+    tuple("conformabli", "conform"),
     tuple("radicalli", "radic"),
-    tuple("differentli", "different"),
+    tuple("differentli", "differ"),
     tuple("vileli", "vile"),
-    tuple("analogousli", "analogous"),
-    tuple("vietnamization", "vietnamize"),
+    tuple("analogousli", "analog"),
+    tuple("vietnamization", "vietnam"),
     tuple("predication", "predic"),
-    tuple("operator", "operate"),
+    tuple("operator", "oper"),
     tuple("feudalism", "feudal"),
-    tuple("decisiveness", "decisive"),
+    tuple("decisiveness", "decis"),
     tuple("hopefulness", "hope"),
     tuple("callousness", "callous"),
     tuple("formaliti", "formal"),
-    tuple("sensitiviti", "sensitive"),
+    tuple("sensitiviti", "sensit"),
     tuple("sensibiliti", "sensible"),
     // 3
     tuple("triplicate", "triplic"),
     tuple("formative", "form"),
     tuple("formalize", "formal"),
-    tuple("electriciti", "electric"),
-    tuple("electrical", "electric"),
+    tuple("electriciti", "electr"),
     tuple("hopeful", "hope"),
     tuple("goodness", "good"),
+
+    // 4
+    tuple("revival", "reviv"),
+    tuple("allowance", "allow"),
+    tuple("inference", "infer"),
+    tuple("airliner", "airlin"),
+    tuple("gyroscopic", "gyroscop"),
+    tuple("adjustable", "adjust"),
+    tuple("defensible", "defens"),
+    tuple("irritant", "irrit"),
+    tuple("replacement", "replac"),
+    tuple("adjustment", "adjust"),
+    tuple("dependent", "depend"),
+    tuple("adoption", "adop"),
+    tuple("homologou", "homolog"),
+    tuple("communism", "commun"),
+    tuple("activate", "activ"),
+    tuple("angulariti", "angular"),
+    tuple("homologous", "homolog"),
+    tuple("effective", "effect"),
+    tuple("bowdlerize", "bowdler"),
   ];
 
   foreach (c; cases)
