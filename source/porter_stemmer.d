@@ -11,6 +11,7 @@ string stem(T)(in T inS)
   auto mc = measure(inS);
 
   step1(s);
+  step2(s);
 
   return s;
 }
@@ -91,6 +92,46 @@ void step1b2(T)(ref T s){
       isVowel(s, s.length - 2) && 
       !isVowel(s, s.length - 1)){
     s ~= "e";
+  }
+}
+
+/*
+  Apply step2
+ */
+void step2(T)(ref T s){
+	auto mappings = [
+		tuple("ational", "ate"),
+		tuple("tional", "tion"),
+		tuple("enci", "ence"),
+		tuple("anci", "ance"),
+		tuple("izer", "ize"),
+		tuple("abli", "able"),
+		tuple("alli", "al"),
+		tuple("entli", "ent"),
+		tuple("eli", "e"),
+		tuple("ousli", "ous"),
+		tuple("ization", "ize"),
+		tuple("ation", "ate"),
+		tuple("ator", "ate"),
+		tuple("alism", "al"),
+		tuple("iveness", "ive"),
+		tuple("fulness", "ful"),
+		tuple("ousness", "ous"),
+		tuple("aliti", "al"),
+		tuple("iviti", "ive"),
+		tuple("biliti", "ble"),
+	];
+
+  foreach(m; mappings){
+    if(s.length <= m[0].length || measure(s, m[0].length) == 0)
+      continue;
+
+
+    if(s[$ - m[0].length .. $] == m[0]){
+      s.length -= m[0].length;
+			s ~= m[1];
+			return;
+    }
   }
 }
 
@@ -191,6 +232,28 @@ unittest
     //1c
     tuple("happy", "happi"),
     tuple("sky", "sky"),
+    // 2
+    tuple("relational", "relate"),
+    tuple("conditional", "condition"),
+    tuple("rational", "rational"),
+    tuple("valenci", "valence"),
+    tuple("hesitanci", "hesitance"),
+    tuple("digitizer", "digitize"),
+    tuple("conformabli", "conformable"),
+    tuple("radicalli", "radical"),
+    tuple("differentli", "different"),
+    tuple("vileli", "vile"),
+    tuple("analogousli", "analogous"),
+    tuple("vietnamization", "vietnamize"),
+    tuple("predication", "predicate"),
+    tuple("operator", "operate"),
+    tuple("feudalism", "feudal"),
+    tuple("decisiveness", "decisive"),
+    tuple("hopefulness", "hopeful"),
+    tuple("callousness", "callous"),
+    tuple("formaliti", "formal"),
+    tuple("sensitiviti", "sensitive"),
+    tuple("sensibiliti", "sensible"),
   ];
 
   foreach (c; cases)
