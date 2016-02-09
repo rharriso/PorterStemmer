@@ -147,7 +147,7 @@ void step3(T)(ref T s){
  applyMappings applies the appropriate map to the passed string,
  and checks a minumum measure
  */
-void applyMapping(T)(ref T s, Tuple!(string, string)[] mappings, ulong minMeasure=1)
+void applyMapping(T)(ref T s, Tuple!(string, string)[] mappings, ulong minMeasure = 1)
 {
   foreach (m; mappings)
   {
