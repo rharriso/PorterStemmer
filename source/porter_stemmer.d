@@ -14,7 +14,7 @@ string stem(T)(in T inS)
   step2(s);
   step3(s);
   step4(s);
-  step5a(s);
+  step5(s);
 
   return s;
 }
@@ -179,16 +179,19 @@ void step4(T)(ref T s)
 /*
   step5a
  */
-void step5a(T)(ref T s){
+void step5(T)(ref T s){
+  // 5a
   auto mappings = [
     tuple("e", ""),
   ]; 
   applyMapping(s, mappings, 2);
-}
 
-/*
-  
- */
+  if(!starO(s[0 .. $-1])){
+    applyMapping(s, mappings, 1);
+  }
+
+  // 5b
+}
 
 /*
  applyMappings applies the appropriate map to the passed string,
@@ -303,14 +306,14 @@ unittest
     tuple("ponies", "poni"),
     //1b
     tuple("feed", "feed"),
-    tuple("agreed", "agree"),
+    tuple("agreed", "agre"),
     tuple("plastered", "plaster"),
     tuple("bled", "bled"),
     tuple("motoring", "motor"),
     tuple("sing", "sing"),
     //1b2
     tuple("conflated", "conflat"),
-    tuple("troubled", "trouble"),
+    tuple("troubled", "troubl"),
     tuple("sized", "size"),
     tuple("hopping", "hop"),
     tuple("tanned", "tan"),
@@ -376,7 +379,8 @@ unittest
     // 5a
     tuple("probate", "probat"),
     tuple("rate", "rate"),
-    //tuple("cease", "ceas"),
+    // 5b
+    tuple("cease", "ceas"),
   ];
 
   foreach (c; cases)
