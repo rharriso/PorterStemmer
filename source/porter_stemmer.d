@@ -191,6 +191,12 @@ void step5(T)(ref T s){
   }
 
   // 5b
+  if(measure(s[0 .. $-1]) > 1 &&
+      s[$-1] == 'l' &&
+      s[$-2] == 'l')
+  {
+    s.length --;
+  }
 }
 
 /*
@@ -379,8 +385,11 @@ unittest
     // 5a
     tuple("probate", "probat"),
     tuple("rate", "rate"),
-    // 5b
     tuple("cease", "ceas"),
+    // 5b
+    tuple("controll", "control"),
+    tuple("roll", "roll"),
+
   ];
 
   foreach (c; cases)
