@@ -14,6 +14,7 @@ string stem(T)(in T inS)
   step2(s);
   step3(s);
   step4(s);
+  step5a(s);
 
   return s;
 }
@@ -176,6 +177,20 @@ void step4(T)(ref T s)
 }
 
 /*
+  step5a
+ */
+void step5a(T)(ref T s){
+  auto mappings = [
+    tuple("e", ""),
+  ]; 
+  applyMapping(s, mappings, 2);
+}
+
+/*
+  
+ */
+
+/*
  applyMappings applies the appropriate map to the passed string,
  and checks a minumum measure
  */
@@ -259,8 +274,21 @@ bool isVowel(T)(in T word, ulong index)
 }
 
 /*
-   returns true if the word ends with 
+   returns true if the word ends with  cvc and the second
+   c is not w,x,y
  */
+bool starO(T)(in T word){
+  if (word.length >= 3 &&
+      !isVowel(word, word.length - 3) &&
+      isVowel(word, word.length - 2) &&
+      !isVowel(word, word.length - 1)){
+
+    auto c = word[$-1];
+    return c != 'w' && c != 'x' && c != 'y';
+  }
+
+  return false;
+}
 
 /*
    stemStes
@@ -281,7 +309,7 @@ unittest
     tuple("motoring", "motor"),
     tuple("sing", "sing"),
     //1b2
-    tuple("conflated", "conflate"),
+    tuple("conflated", "conflat"),
     tuple("troubled", "trouble"),
     tuple("sized", "size"),
     tuple("hopping", "hop"),
@@ -295,10 +323,10 @@ unittest
     tuple("happy", "happi"),
     tuple("sky", "sky"),
     // 2
-    tuple("relational", "relate"),
+    tuple("relational", "relat"),
     tuple("conditional", "condition"),
     tuple("rational", "ration"),
-    tuple("valenci", "valence"),
+    tuple("valenci", "valenc"),
     tuple("hesitanci", "hesit"),
     tuple("digitizer", "digit"),
     tuple("conformabli", "conform"),
@@ -315,7 +343,7 @@ unittest
     tuple("callousness", "callous"),
     tuple("formaliti", "formal"),
     tuple("sensitiviti", "sensit"),
-    tuple("sensibiliti", "sensible"),
+    tuple("sensibiliti", "sensibl"),
     // 3
     tuple("triplicate", "triplic"),
     tuple("formative", "form"),
@@ -344,6 +372,11 @@ unittest
     tuple("homologous", "homolog"),
     tuple("effective", "effect"),
     tuple("bowdlerize", "bowdler"),
+
+    // 5a
+    tuple("probate", "probat"),
+    tuple("rate", "rate"),
+    //tuple("cease", "ceas"),
   ];
 
   foreach (c; cases)
@@ -426,9 +459,31 @@ unittest
 
   foreach (c; cases)
   {
-    auto msg = c[2] ? "Expected '" ~ c[0][c[1]] ~ "' in '" ~ c[0] ~ "' to be a vowel "
-      : "Expected '" ~ c[0][c[1]] ~ "' in '" ~ c[0] ~ "' not to be a vowel ";
+    auto msg = c[2] ?
+      "Expected '" ~ c[0][c[1]] ~ "' in '" ~ c[0] ~ "' to be a vowel " :
+      "Expected '" ~ c[0][c[1]] ~ "' in '" ~ c[0] ~ "' not to be a vowel ";
     assert(isVowel(c[0], c[1]) == c[2], msg);
+  }
+
+}
+
+/*
+  starO tests
+ */
+unittest
+{
+  auto cases = [
+    tuple("wow", false),
+    tuple("wil", true),
+    tuple("hop", true),
+  ];
+
+  foreach (c; cases)
+  {
+    auto msg = c[1] ?
+      "Expected starO '" ~ c[0]~ "' to be true" :
+      "Expected starO '" ~ c[0]~ "' to be false";
+    assert(starO(c[0]) == c[1], msg);
   }
 
 }
