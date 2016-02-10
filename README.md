@@ -9,7 +9,7 @@ Porter Stemmer for Dlang
 * [x] step2
 * [x] step3
 * [x] step4
-* [ ] step5a
-* [ ] step5b
+* [x] step5a
+* [x] step5b
 * [ ] benchmarks
 * [ ] compare with python nltk porter stemmer
