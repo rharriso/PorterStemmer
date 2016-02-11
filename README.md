@@ -11,6 +11,6 @@ Porter Stemmer for Dlang
 * [x] step4
 * [x] step5a
 * [x] step5b
-* [ ] benchmarks
+* [x] benchmarks
+* [x] benchmarks (implemented with python porter stemmer)
 * [ ] compare with python nltk porter stemmer
-* [ ] snowball 
