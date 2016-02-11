@@ -65,7 +65,7 @@ void step1(T)(ref T s)
   }
 
   //step1c
-  if (s[$ - 1] == 'y' && containsVowel(s[0 .. $ - 1]))
+  if (s.length > 1 && s[$ - 1] == 'y' && containsVowel(s[0 .. $ - 1]))
   {
     replaceInPlace(s, s.length - 1, s.length, "i");
   }
@@ -186,12 +186,12 @@ void step5(T)(ref T s){
   ]; 
   applyMapping(s, mappings, 2);
 
-  if(!starO(s[0 .. $-1])){
+  if(s.length > 1 && !starO(s[0 .. $-1])){
     applyMapping(s, mappings, 1);
   }
 
   // 5b
-  if(measure(s[0 .. $-1]) > 1 &&
+  if(s.length > 1 && measure(s[0 .. $-1]) > 1 &&
       s[$-1] == 'l' &&
       s[$-2] == 'l')
   {
@@ -499,4 +499,48 @@ unittest
     assert(starO(c[0]) == c[1], msg);
   }
 
+}
+
+/*
+ Benchmarks and compare with python
+ */
+
+version(unittest){
+  import std.file;
+  import std.regex;
+  import std.datetime;
+  import std.conv : to;
+}
+
+unittest
+{
+  auto txt = readText("./test/de-bello-gallico.txt"); // assume running text from project root
+  auto r = regex(r"\b");
+  auto tokens = split(txt, r);
+  string[] stems;
+
+  void f1 (){
+    stems = [];
+    foreach(t; tokens){
+      stems ~= stem(t);
+    }
+    writeln("Cycle completed...");
+  }
+
+  writeln("\nRunning Benchmark...\n");
+  int cycles = 10;
+  auto res = benchmark!(f1)(cycles);
+  writeln("Stemmed 'De Bello Gallico' ", cycles, " times in ", res[0].msecs(), " milliseconds");
+  writeln(to!(double)(res[0].seconds()) / cycles, " seconds per pass");
+  writeln("\nCompleted Benchmark\n");
+
+  auto outFileName = "./test/stemmed-bello-gallico.txt";
+  if(exists(outFileName)){
+    remove(outFileName);
+  }
+  foreach(s; stems){
+    append(outFileName, s);
+    append(outFileName, "\n");
+  }
+  writeln("Wrote stems to: ", outFileName, "\n");
 }
