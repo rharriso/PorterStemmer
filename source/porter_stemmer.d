@@ -515,7 +515,8 @@ version(unittest){
 unittest
 {
   auto txt = readText("./test/de-bello-gallico.txt"); // assume running text from project root
-  auto r = regex(r"\b");
+  auto r = regex(r"[^\w]+");
+
   auto tokens = split(txt, r);
   string[] stems;
 
