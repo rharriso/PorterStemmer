@@ -163,8 +163,6 @@ void step4(T)(ref T s)
     tuple("ement", ""),
     tuple("ment", ""),
     tuple("ent", ""),
-    tuple("sion", "s"),
-    tuple("tion", "t"),
     tuple("ou", ""),
     tuple("ism", ""),
     tuple("ate", ""),
@@ -175,6 +173,19 @@ void step4(T)(ref T s)
   ];
 
   applyMapping(s, mappings, 2);
+
+  // (s|t)ion -> (s|t)
+  if(s.length > 4){
+    auto tail = s[$ - 3 .. $];
+    auto stem = s[0 .. $ - 3];
+    auto stemL = stem[$ - 1]; 
+
+    if((stemL == 's' || stemL == 't')
+        && tail == "ion" && measure(stem) > 1)
+    {
+      s.length -= 3;
+    }
+  }
 }
 
 /*
@@ -308,12 +319,14 @@ unittest
   // cases are just pairs onf expected outputs
   auto cases = [
     // from nltk compar
+    tuple("rational", "ration"),
     tuple("reproduction", "reproduct"),
     tuple("resolve", "resolv"),
     tuple("they", "thei"),
     tuple("is", "is"),
     tuple("reservation", "reserv"),
     tuple("reserved", "reserv"),
+    tuple("precaution", "precaut"),
     //1a
     tuple("caresses", "caress"),
     tuple("ties", "ti"),
@@ -342,7 +355,7 @@ unittest
     tuple("sky", "sky"),
     // 2
     tuple("relational", "relat"),
-    tuple("conditional", "condition"),
+    tuple("conditional", "condit"),
     tuple("rational", "ration"),
     tuple("valenci", "valenc"),
     tuple("hesitanci", "hesit"),
