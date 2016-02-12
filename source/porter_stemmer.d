@@ -10,11 +10,13 @@ string stem(T)(in T inS)
   string s = inS.toLower();
   auto mc = measure(inS);
 
-  step1(s);
-  step2(s);
-  step3(s);
-  step4(s);
-  step5(s);
+  if(s.length > 2){
+    step1(s);
+    step2(s);
+    step3(s);
+    step4(s);
+    step5(s);
+  }
 
   return s;
 }
@@ -80,12 +82,11 @@ void step1b2(T)(ref T s)
 
   if (s.length > 2 && tail == "at" || tail == "iz" || tail == "bl")
   {
-
     s ~= "e";
   }
 
-  else if (!isVowel(tail, 0) && !isVowel(tail, 1) && !(tail[1] == 'l'
-      || tail[1] == 's' || tail[1] == 'z'))
+  else if (!isVowel(tail, 0) && !isVowel(tail, 1) &&
+      !(tail[1] == 'l' || tail[1] == 's' || tail[1] == 'z'))
   {
     s.length--;
   }
@@ -162,8 +163,8 @@ void step4(T)(ref T s)
     tuple("ement", ""),
     tuple("ment", ""),
     tuple("ent", ""),
-    tuple("tion", ""),
-    tuple("sion", ""),
+    tuple("sion", "s"),
+    tuple("tion", "t"),
     tuple("ou", ""),
     tuple("ism", ""),
     tuple("ate", ""),
@@ -306,6 +307,12 @@ unittest
 {
   // cases are just pairs onf expected outputs
   auto cases = [
+    // from nltk compar
+    tuple("reproduction", "reproduct"),
+    tuple("resolve", "resolv"),
+    tuple("they", "thei"),
+    tuple("is", "is"),
+    //1a
     tuple("caresses", "caress"),
     tuple("ties", "ti"),
     tuple("cats", "cat"),
@@ -373,7 +380,7 @@ unittest
     tuple("replacement", "replac"),
     tuple("adjustment", "adjust"),
     tuple("dependent", "depend"),
-    tuple("adoption", "adop"),
+    tuple("adoption", "adopt"),
     tuple("homologou", "homolog"),
     tuple("communism", "commun"),
     tuple("activate", "activ"),
