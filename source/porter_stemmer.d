@@ -85,7 +85,7 @@ void step1b2(T)(ref T s)
     s ~= "e";
   }
 
-  else if (!isVowel(tail, 0) && !isVowel(tail, 1) &&
+  else if (!isVowel(tail, 0) && tail[0] == tail[1] &&
       !(tail[1] == 'l' || tail[1] == 's' || tail[1] == 'z'))
   {
     s.length--;
@@ -312,6 +312,8 @@ unittest
     tuple("resolve", "resolv"),
     tuple("they", "thei"),
     tuple("is", "is"),
+    tuple("reservation", "reserv"),
+    tuple("reserved", "reserv"),
     //1a
     tuple("caresses", "caress"),
     tuple("ties", "ti"),
