@@ -14,3 +14,10 @@ Porter Stemmer for Dlang
 * [x] benchmarks
 * [x] benchmarks (implemented with python porter stemmer)
 * [ ] compare with python nltk porter stemmer
+
+### Benchmark instructions
+
+`dub --config=bench --build=release`
+
+Use `--compiler=ldc2` or `--compiler=gdc` to use those compilers
+and probably get better results.
