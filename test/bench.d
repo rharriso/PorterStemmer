@@ -15,28 +15,22 @@ import porter_stemmer;
 void main()
 {
   auto txt = readText("./test/de-bello-gallico.txt"); // assume running text from project root
-  auto r = regex(r"[^\w]+");
+  static r = ctRegex!(r"[^\w]+");
 
   auto tokens = split(txt, r);
-  string[] stems;
+  auto stems = new typeof(tokens)(tokens.length);
 
   void f0()
   {
-    import core.memory;
-    GC.disable;
-    auto app = appender(&stems);
-    foreach(token; tokens)
-      app ~= stem(token);
+    tokens.map!stem.copy(stems);
     writeln("Cycle completed...");
-    GC.enable;
-    GC.collect;
   }
 
   writeln("\nRunning Benchmark...\n");
-  int cycles = 10;
+  int cycles = 20;
   auto res = benchmark!f0(cycles);
   writeln("Stemmed 'De Bello Gallico' ", cycles, " times in ", res[0].msecs(), " milliseconds");
-  writeln(double(res[0].nsecs()) / (10^^9 * cycles), " seconds per pass");
+  writeln(double(res[0].nsecs()) / (10.0^^9 * cycles), " seconds per pass");
   writeln("\nCompleted Benchmark\n");
 
   auto outFileName = "./test/stemmed-bello-gallico.txt";

@@ -1,14 +1,20 @@
 module porter_stemmer;
 
 import std.typecons;
-import std.string;
-import std.array;
 import std.stdio;
+import std.traits;
+import std.ascii;
+import std.utf;
+import std.algorithm;
+import std.exception;
 
-string stem(T)(in T inS)
+auto stem(T)(in T inS)
+if (isSomeString!T)
 {
-  string s = inS.toLower();
-  auto mc = measure(inS);
+  Unqual!(ForeachType!T)[256] buff;
+  auto s = buff[0 .. inS.length];
+  foreach(i; 0 .. s.length)
+    s[i] = std.ascii.toLower(inS[i]);
 
   if(s.length > 2){
     step1(s);
@@ -18,7 +24,7 @@ string stem(T)(in T inS)
     step5(s);
   }
 
-  return s;
+  return s.idup;
 }
 
 /*
@@ -30,12 +36,12 @@ void step1(T)(ref T s)
   if (s.length > 4 && s[$ - 4 .. $] == "sses")
   {
     s = s[0 .. $-2];
-    replaceInPlace(s, s.length - 2, s.length, "ss");
+    s[$-2 .. $] = "ss";
   }
   else if (s.length > 3 && s[$ - 3 .. $] == "ies")
   {
     s = s[0 .. $-2];
-    replaceInPlace(s, s.length - 1, s.length, "i");
+    s[$-1] = 'i';
   }
   else if (s.length > 2 && s[$ - 2 .. $] == "ss")
   {
@@ -53,7 +59,6 @@ void step1(T)(ref T s)
       s = s[0 .. $-1];
     }
   }
-
   else if (s.length > 2 && s[$ - 2 .. $] == "ed" && containsVowel(s[0 .. $ - 2]))
   {
     s = s[0 .. $-2];
@@ -68,7 +73,7 @@ void step1(T)(ref T s)
   //step1c
   if (s.length > 1 && s[$ - 1] == 'y' && containsVowel(s[0 .. $ - 1]))
   {
-    replaceInPlace(s, s.length - 1, s.length, "i");
+    s[$-1] = 'i';
   }
 }
 
@@ -81,6 +86,7 @@ void step1b2(T)(ref T s)
 
   if (s.length > 2 && tail == "at" || tail == "iz" || tail == "bl")
   {
+    s.assumeSafeAppend;
     s ~= "e";
   }
 
@@ -93,6 +99,7 @@ void step1b2(T)(ref T s)
   else if (measure(s) == 1 && !isVowel(s, s.length - 3) && isVowel(s,
       s.length - 2) && !isVowel(s, s.length - 1))
   {
+    s.assumeSafeAppend;
     s ~= "e";
   }
 }
@@ -102,7 +109,7 @@ void step1b2(T)(ref T s)
  */
 void step2(T)(ref T s)
 {
-  auto mappings = [
+  static mappings = [
     tuple("ational", "ate"),
     tuple("tional", "tion"),
     tuple("enci", "ence"),
@@ -132,7 +139,7 @@ void step2(T)(ref T s)
    apply step
  */
 void step3(T)(ref T s){
-  auto mappings = [
+  static mappings = [
     tuple("icate", "ic"),
     tuple("ative", ""),
     tuple("alize", "al"),
@@ -150,7 +157,7 @@ void step3(T)(ref T s){
  */
 void step4(T)(ref T s)
 {
-  auto mappings = [
+  static mappings = [
     tuple("al", ""),
     tuple("ance", ""),
     tuple("ence", ""),
@@ -192,7 +199,7 @@ void step4(T)(ref T s)
  */
 void step5(T)(ref T s){
   // 5a
-  auto mappings = [
+  static mappings = [
     tuple("e", ""),
   ];
   applyMapping(s, mappings, 2);
@@ -211,7 +218,7 @@ void step5(T)(ref T s){
 }
 
 /*
- applyMappings applies the appropriate map to the passed string,
+ applyMapping applies the appropriate map to the passed string,
  and checks a minumum measure
  */
 void applyMapping(T)(ref T s, Tuple!(string, string)[] mappings, ulong minMeasure = 1)
@@ -223,8 +230,18 @@ void applyMapping(T)(ref T s, Tuple!(string, string)[] mappings, ulong minMeasur
 
     if (s[$ - m[0].length .. $] == m[0])
     {
-      s = s[0 .. $ - m[0].length];
-      s ~= m[1];
+      auto lengthDiff = long(m[0].length) - long(m[1].length);
+      if (lengthDiff >= 0)
+      {
+        s = s[0 .. $ - lengthDiff];
+        s[$ - m[1].length .. $] = m[1];
+      }
+      else //never happens with current mappings
+      {
+        s = s[0 .. $ - m[0].length];
+        s.assumeSafeAppend;
+        s ~= m[1];
+      }
       return;
     }
   }
@@ -237,7 +254,7 @@ ulong measure(T)(in T word, ulong offset = 0)
 {
   ulong m = 0;
   auto isV = isVowel(word, 0);
-  auto len = long(word.length) - offset;
+  auto len = long(word.length) - long(offset);
 
   foreach (i; 1 .. len)
   {
