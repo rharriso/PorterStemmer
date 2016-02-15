@@ -1,8 +1,14 @@
-import std.file;
+/**
+ Benchmarks and compare with python
+ */
+
+import std.file : readText;
 import std.regex;
 import std.datetime;
 import std.conv : to;
 import std.stdio;
+import std.algorithm;
+import std.array;
 
 import porter_stemmer;
 
@@ -14,29 +20,27 @@ void main()
   auto tokens = split(txt, r);
   string[] stems;
 
-  void f1 (){
-    stems = [];
-    foreach(t; tokens){
-      stems ~= stem(t);
-    }
+  void f0()
+  {
+    import core.memory;
+    GC.disable;
+    auto app = appender(&stems);
+    foreach(token; tokens)
+      app ~= stem(token);
     writeln("Cycle completed...");
+    GC.enable;
+    GC.collect;
   }
 
   writeln("\nRunning Benchmark...\n");
   int cycles = 10;
-  auto res = benchmark!(f1)(cycles);
+  auto res = benchmark!f0(cycles);
   writeln("Stemmed 'De Bello Gallico' ", cycles, " times in ", res[0].msecs(), " milliseconds");
-  writeln(to!(double)(res[0].seconds()) / cycles, " seconds per pass");
+  writeln(double(res[0].nsecs()) / (10^^9 * cycles), " seconds per pass");
   writeln("\nCompleted Benchmark\n");
 
   auto outFileName = "./test/stemmed-bello-gallico.txt";
-  if(exists(outFileName)){
-    remove(outFileName);
-  }
-  foreach(s; stems){
-    append(outFileName, s);
-    append(outFileName, "\n");
-  }
+  File(outFileName).write(stems.joiner("\n"));
   writeln("Wrote stems to: ", outFileName, "\n");
 }
 

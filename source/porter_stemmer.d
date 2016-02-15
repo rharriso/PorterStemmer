@@ -29,12 +29,12 @@ void step1(T)(ref T s)
   //step 1a
   if (s.length > 4 && s[$ - 4 .. $] == "sses")
   {
-    s.length -= 2;
+    s = s[0 .. $-2];
     replaceInPlace(s, s.length - 2, s.length, "ss");
   }
   else if (s.length > 3 && s[$ - 3 .. $] == "ies")
   {
-    s.length -= 2;
+    s = s[0 .. $-2];
     replaceInPlace(s, s.length - 1, s.length, "i");
   }
   else if (s.length > 2 && s[$ - 2 .. $] == "ss")
@@ -42,7 +42,7 @@ void step1(T)(ref T s)
   }
   else if (s.length > 1 && s[$ - 1 .. $] == "s")
   {
-    s.length--;
+    s = s[0 .. $-1];
   }
 
   //step 1b
@@ -50,19 +50,18 @@ void step1(T)(ref T s)
   {
     if (measure(s, 4) > 0)
     {
-      s.length--;
+      s = s[0 .. $-1];
     }
   }
 
   else if (s.length > 2 && s[$ - 2 .. $] == "ed" && containsVowel(s[0 .. $ - 2]))
   {
-
-    s.length -= 2;
+    s = s[0 .. $-2];
     step1b2(s);
   }
   else if (s.length > 3 && s[$ - 3 .. $] == "ing" && containsVowel(s[0 .. $ - 3]))
   {
-    s.length -= 3;
+    s = s[0 .. $-3];
     step1b2(s);
   }
 
@@ -88,7 +87,7 @@ void step1b2(T)(ref T s)
   else if (!isVowel(tail, 0) && tail[0] == tail[1] &&
       !(tail[1] == 'l' || tail[1] == 's' || tail[1] == 'z'))
   {
-    s.length--;
+    s = s[0 .. $-1];
   }
 
   else if (measure(s) == 1 && !isVowel(s, s.length - 3) && isVowel(s,
@@ -178,12 +177,12 @@ void step4(T)(ref T s)
   if(s.length > 4){
     auto tail = s[$ - 3 .. $];
     auto stem = s[0 .. $ - 3];
-    auto stemL = stem[$ - 1]; 
+    auto stemL = stem[$ - 1];
 
     if((stemL == 's' || stemL == 't')
         && tail == "ion" && measure(stem) > 1)
     {
-      s.length -= 3;
+      s = s[0 .. $-3];
     }
   }
 }
@@ -195,7 +194,7 @@ void step5(T)(ref T s){
   // 5a
   auto mappings = [
     tuple("e", ""),
-  ]; 
+  ];
   applyMapping(s, mappings, 2);
 
   if(s.length > 1 && !starO(s[0 .. $-1])){
@@ -207,7 +206,7 @@ void step5(T)(ref T s){
       s[$-1] == 'l' &&
       s[$-2] == 'l')
   {
-    s.length --;
+    s = s[0 .. $-1];
   }
 }
 
@@ -224,12 +223,11 @@ void applyMapping(T)(ref T s, Tuple!(string, string)[] mappings, ulong minMeasur
 
     if (s[$ - m[0].length .. $] == m[0])
     {
-      s.length -= m[0].length;
+      s = s[0 .. $ - m[0].length];
       s ~= m[1];
       return;
     }
   }
-
 }
 
 /*
@@ -241,7 +239,7 @@ ulong measure(T)(in T word, ulong offset = 0)
   auto isV = isVowel(word, 0);
   auto len = long(word.length) - offset;
 
-  for (int i = 1; i < len; i++)
+  foreach (i; 1 .. len)
   {
     auto newV = isVowel(word, i);
 
@@ -262,7 +260,7 @@ ulong measure(T)(in T word, ulong offset = 0)
  */
 bool containsVowel(T)(in T word)
 {
-  for (auto i = 0; i < word.length; i++)
+  foreach (i; 0 .. word.length)
   {
     if (isVowel(word, i))
     {
@@ -522,8 +520,4 @@ unittest
   }
 
 }
-
-/*
- Benchmarks and compare with python
- */
 
