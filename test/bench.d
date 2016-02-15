@@ -34,7 +34,7 @@ void main()
   writeln("\nCompleted Benchmark\n");
 
   auto outFileName = "./test/stemmed-bello-gallico.txt";
-  File(outFileName).write(stems.joiner("\n"));
+  File(outFileName, "w").write(stems.joiner("\n"));
   writeln("Wrote stems to: ", outFileName, "\n");
 }
 
