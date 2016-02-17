@@ -32,3 +32,6 @@ __dummy.html
 # nothing to see here!!!
 /ASOIAF
 /test/stemmed-bello-gallico.txt
+/__test__default__
+/dub.selections.json
+/porterstemmer
