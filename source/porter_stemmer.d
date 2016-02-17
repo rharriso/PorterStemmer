@@ -7,12 +7,14 @@ import std.ascii;
 import std.utf;
 import std.algorithm;
 import std.exception;
+import std.stdio;
 
 auto stem(T)(in T inS)
 if (isSomeString!T)
 {
   Unqual!(ForeachType!T)[256] buff;
   auto s = buff[0 .. inS.length];
+
   foreach(i; 0 .. s.length)
     s[i] = std.ascii.toLower(inS[i]);
 
@@ -426,6 +428,10 @@ unittest
     // 5b
     tuple("controll", "control"),
     tuple("roll", "roll"),
+
+    // unicode
+    tuple("frühling", "frühling"), // no 'vowels'
+    tuple("straße", "straß")
 
   ];
 
