@@ -7,7 +7,6 @@ import std.ascii;
 import std.utf;
 import std.algorithm;
 import std.exception;
-import std.stdio;
 
 auto stem(T)(in T inS)
 if (isSomeString!T)
