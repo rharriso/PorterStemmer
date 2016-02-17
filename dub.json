@@ -1,8 +1,16 @@
 {
-	"name": "porterstemmer",
-	"description": "A minimal D application.",
-	"copyright": "Copyright © 2016, rharriso",
-	"authors": ["rharriso"],
-	"dependencies": {
-	}
+    "name": "porterstemmer",
+    "description": "An implementation of the Porter Stemmer algorithm",
+    "copyright": "Copyright © 2016, rharriso",
+    "authors": ["rharriso"],
+    "configurations": [
+        {
+            "name": "default"
+        },
+        {
+            "name": "bench",
+            "mainSourceFile": "test/bench.d",
+            "targetType": "executable"
+        }
+    ]
 }

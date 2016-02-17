@@ -1,14 +1,20 @@
 module porter_stemmer;
 
 import std.typecons;
-import std.string;
-import std.array;
 import std.stdio;
+import std.traits;
+import std.ascii;
+import std.utf;
+import std.algorithm;
+import std.exception;
 
-string stem(T)(in T inS)
+auto stem(T)(in T inS)
+if (isSomeString!T)
 {
-  string s = inS.toLower();
-  auto mc = measure(inS);
+  Unqual!(ForeachType!T)[256] buff;
+  auto s = buff[0 .. inS.length];
+  foreach(i; 0 .. s.length)
+    s[i] = std.ascii.toLower(inS[i]);
 
   if(s.length > 2){
     step1(s);
@@ -18,7 +24,7 @@ string stem(T)(in T inS)
     step5(s);
   }
 
-  return s;
+  return s.idup;
 }
 
 /*
@@ -29,20 +35,20 @@ void step1(T)(ref T s)
   //step 1a
   if (s.length > 4 && s[$ - 4 .. $] == "sses")
   {
-    s.length -= 2;
-    replaceInPlace(s, s.length - 2, s.length, "ss");
+    s = s[0 .. $-2];
+    s[$-2 .. $] = "ss";
   }
   else if (s.length > 3 && s[$ - 3 .. $] == "ies")
   {
-    s.length -= 2;
-    replaceInPlace(s, s.length - 1, s.length, "i");
+    s = s[0 .. $-2];
+    s[$-1] = 'i';
   }
   else if (s.length > 2 && s[$ - 2 .. $] == "ss")
   {
   }
   else if (s.length > 1 && s[$ - 1 .. $] == "s")
   {
-    s.length--;
+    s = s[0 .. $-1];
   }
 
   //step 1b
@@ -50,26 +56,24 @@ void step1(T)(ref T s)
   {
     if (measure(s, 4) > 0)
     {
-      s.length--;
+      s = s[0 .. $-1];
     }
   }
-
   else if (s.length > 2 && s[$ - 2 .. $] == "ed" && containsVowel(s[0 .. $ - 2]))
   {
-
-    s.length -= 2;
+    s = s[0 .. $-2];
     step1b2(s);
   }
   else if (s.length > 3 && s[$ - 3 .. $] == "ing" && containsVowel(s[0 .. $ - 3]))
   {
-    s.length -= 3;
+    s = s[0 .. $-3];
     step1b2(s);
   }
 
   //step1c
   if (s.length > 1 && s[$ - 1] == 'y' && containsVowel(s[0 .. $ - 1]))
   {
-    replaceInPlace(s, s.length - 1, s.length, "i");
+    s[$-1] = 'i';
   }
 }
 
@@ -82,18 +86,20 @@ void step1b2(T)(ref T s)
 
   if (s.length > 2 && tail == "at" || tail == "iz" || tail == "bl")
   {
+    s.assumeSafeAppend;
     s ~= "e";
   }
 
   else if (!isVowel(tail, 0) && tail[0] == tail[1] &&
       !(tail[1] == 'l' || tail[1] == 's' || tail[1] == 'z'))
   {
-    s.length--;
+    s = s[0 .. $-1];
   }
 
   else if (measure(s) == 1 && !isVowel(s, s.length - 3) && isVowel(s,
       s.length - 2) && !isVowel(s, s.length - 1))
   {
+    s.assumeSafeAppend;
     s ~= "e";
   }
 }
@@ -103,7 +109,7 @@ void step1b2(T)(ref T s)
  */
 void step2(T)(ref T s)
 {
-  auto mappings = [
+  static mappings = [
     tuple("ational", "ate"),
     tuple("tional", "tion"),
     tuple("enci", "ence"),
@@ -133,7 +139,7 @@ void step2(T)(ref T s)
    apply step
  */
 void step3(T)(ref T s){
-  auto mappings = [
+  static mappings = [
     tuple("icate", "ic"),
     tuple("ative", ""),
     tuple("alize", "al"),
@@ -151,7 +157,7 @@ void step3(T)(ref T s){
  */
 void step4(T)(ref T s)
 {
-  auto mappings = [
+  static mappings = [
     tuple("al", ""),
     tuple("ance", ""),
     tuple("ence", ""),
@@ -178,12 +184,12 @@ void step4(T)(ref T s)
   if(s.length > 4){
     auto tail = s[$ - 3 .. $];
     auto stem = s[0 .. $ - 3];
-    auto stemL = stem[$ - 1]; 
+    auto stemL = stem[$ - 1];
 
     if((stemL == 's' || stemL == 't')
         && tail == "ion" && measure(stem) > 1)
     {
-      s.length -= 3;
+      s = s[0 .. $-3];
     }
   }
 }
@@ -193,9 +199,9 @@ void step4(T)(ref T s)
  */
 void step5(T)(ref T s){
   // 5a
-  auto mappings = [
+  static mappings = [
     tuple("e", ""),
-  ]; 
+  ];
   applyMapping(s, mappings, 2);
 
   if(s.length > 1 && !starO(s[0 .. $-1])){
@@ -207,12 +213,12 @@ void step5(T)(ref T s){
       s[$-1] == 'l' &&
       s[$-2] == 'l')
   {
-    s.length --;
+    s = s[0 .. $-1];
   }
 }
 
 /*
- applyMappings applies the appropriate map to the passed string,
+ applyMapping applies the appropriate map to the passed string,
  and checks a minumum measure
  */
 void applyMapping(T)(ref T s, Tuple!(string, string)[] mappings, ulong minMeasure = 1)
@@ -224,12 +230,21 @@ void applyMapping(T)(ref T s, Tuple!(string, string)[] mappings, ulong minMeasur
 
     if (s[$ - m[0].length .. $] == m[0])
     {
-      s.length -= m[0].length;
-      s ~= m[1];
+      auto lengthDiff = long(m[0].length) - long(m[1].length);
+      if (lengthDiff >= 0)
+      {
+        s = s[0 .. $ - lengthDiff];
+        s[$ - m[1].length .. $] = m[1];
+      }
+      else //never happens with current mappings
+      {
+        s = s[0 .. $ - m[0].length];
+        s.assumeSafeAppend;
+        s ~= m[1];
+      }
       return;
     }
   }
-
 }
 
 /*
@@ -239,9 +254,9 @@ ulong measure(T)(in T word, ulong offset = 0)
 {
   ulong m = 0;
   auto isV = isVowel(word, 0);
-  auto len = long(word.length) - offset;
+  auto len = long(word.length) - long(offset);
 
-  for (int i = 1; i < len; i++)
+  foreach (i; 1 .. len)
   {
     auto newV = isVowel(word, i);
 
@@ -262,7 +277,7 @@ ulong measure(T)(in T word, ulong offset = 0)
  */
 bool containsVowel(T)(in T word)
 {
-  for (auto i = 0; i < word.length; i++)
+  foreach (i; 0 .. word.length)
   {
     if (isVowel(word, i))
     {
@@ -523,47 +538,3 @@ unittest
 
 }
 
-/*
- Benchmarks and compare with python
- */
-
-version(unittest){
-  import std.file;
-  import std.regex;
-  import std.datetime;
-  import std.conv : to;
-}
-
-unittest
-{
-  auto txt = readText("./test/de-bello-gallico.txt"); // assume running text from project root
-  auto r = regex(r"[^\w]+");
-
-  auto tokens = split(txt, r);
-  string[] stems;
-
-  void f1 (){
-    stems = [];
-    foreach(t; tokens){
-      stems ~= stem(t);
-    }
-    writeln("Cycle completed...");
-  }
-
-  writeln("\nRunning Benchmark...\n");
-  int cycles = 10;
-  auto res = benchmark!(f1)(cycles);
-  writeln("Stemmed 'De Bello Gallico' ", cycles, " times in ", res[0].msecs(), " milliseconds");
-  writeln(to!(double)(res[0].seconds()) / cycles, " seconds per pass");
-  writeln("\nCompleted Benchmark\n");
-
-  auto outFileName = "./test/stemmed-bello-gallico.txt";
-  if(exists(outFileName)){
-    remove(outFileName);
-  }
-  foreach(s; stems){
-    append(outFileName, s);
-    append(outFileName, "\n");
-  }
-  writeln("Wrote stems to: ", outFileName, "\n");
-}
