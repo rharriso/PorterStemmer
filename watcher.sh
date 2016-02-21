@@ -11,5 +11,5 @@ while true; do
   change=$(inotifywait -e close_write **/*.d)
   change=${change#./ * }
   clear
-  dub test
+  dub --config=bench --build=release --compiler=ldc2
 done
