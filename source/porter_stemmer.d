@@ -430,7 +430,10 @@ unittest
 
     // unicode
     tuple("frühling", "frühling"), // no 'vowels'
-    tuple("straße", "straß")
+    tuple("straße", "straß"),
+    tuple("Œstraße", "Œstraß"),
+    tuple("☧Œstraße", "☧Œstraß"),
+    tuple("⚷☧Œstraße", "⚷☧Œstraß"),
 
   ];
 
