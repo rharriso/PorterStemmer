@@ -36,20 +36,18 @@ void step1(T)(ref T s)
   //step 1a
   if (s.length > 4 && s[$ - 4 .. $] == "sses")
   {
-    s = s[0 .. $-2];
-    s[$-2 .. $] = "ss";
+    s.length -= 2;
   }
   else if (s.length > 3 && s[$ - 3 .. $] == "ies")
   {
-    s = s[0 .. $-2];
-    s[$-1] = 'i';
+    s.length -= 2;
   }
   else if (s.length > 2 && s[$ - 2 .. $] == "ss")
   {
   }
   else if (s.length > 1 && s[$ - 1 .. $] == "s")
   {
-    s = s[0 .. $-1];
+    s.length -= 1;
   }
 
   //step 1b
@@ -57,17 +55,17 @@ void step1(T)(ref T s)
   {
     if (measure(s, 4) > 0)
     {
-      s = s[0 .. $-1];
+      s.length -= 1;
     }
   }
   else if (s.length > 2 && s[$ - 2 .. $] == "ed" && containsVowel(s[0 .. $ - 2]))
   {
-    s = s[0 .. $-2];
+    s.length -= 2;
     step1b2(s);
   }
   else if (s.length > 3 && s[$ - 3 .. $] == "ing" && containsVowel(s[0 .. $ - 3]))
   {
-    s = s[0 .. $-3];
+    s.length -= 3;
     step1b2(s);
   }
 
@@ -94,7 +92,7 @@ void step1b2(T)(ref T s)
   else if (!isVowel(tail, 0) && tail[0] == tail[1] &&
       !(tail[1] == 'l' || tail[1] == 's' || tail[1] == 'z'))
   {
-    s = s[0 .. $-1];
+    s.length -= 1;
   }
 
   else if (measure(s) == 1 && !isVowel(s, s.length - 3) && isVowel(s,
@@ -214,7 +212,7 @@ void step5(T)(ref T s){
       s[$-1] == 'l' &&
       s[$-2] == 'l')
   {
-    s = s[0 .. $-1];
+    s.length -= 1;
   }
 }
 
