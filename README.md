@@ -15,6 +15,8 @@ Porter Stemmer for Dlang
 * [x] benchmarks (implemented with python porter stemmer)
 * [x] compare with python nltk porter stemmer
 * [x] bench against C implementation 
+* [x] Check capital unicode chars
+* [ ] release to d repo
 
 ### Benchmark instructions
 
