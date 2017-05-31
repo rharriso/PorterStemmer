@@ -229,7 +229,7 @@ void applyMapping(T)(ref T s, Tuple!(string, string)[] mappings, ulong minMeasur
 
     if (s[$ - m[0].length .. $] == m[0])
     {
-      auto lengthDiff = long(m[0].length) - long(m[1].length);
+      auto lengthDiff = sizediff_t(m[0].length) - sizediff_t(m[1].length);
       if (lengthDiff >= 0)
       {
         s = s[0 .. $ - lengthDiff];
@@ -249,11 +249,11 @@ void applyMapping(T)(ref T s, Tuple!(string, string)[] mappings, ulong minMeasur
 /*
    returns the mcount for the given word
  */
-ulong measure(T)(in T word, ulong offset = 0)
+ulong measure(T)(in T word, size_t offset = 0)
 {
   ulong m = 0;
   auto isV = isVowel(word, 0);
-  auto len = long(word.length) - long(offset);
+  auto len = sizediff_t(word.length) - sizediff_t(offset);
 
   foreach (i; 1 .. len)
   {
@@ -290,7 +290,7 @@ bool containsVowel(T)(in T word)
    Returns true if the letter at
    the passed index is a vowel
  */
-bool isVowel(T)(in T word, ulong index)
+bool isVowel(T)(in T word, size_t index)
 {
   if (index >= word.length)
   {
